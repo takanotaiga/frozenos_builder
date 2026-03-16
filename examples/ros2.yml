@@ -1,0 +1,23 @@
+kind: iso.build/v1
+name: frozenos-ros2
+
+base:
+  iso: ../ubuntu-24.04.4-desktop-amd64.iso
+
+build:
+  workspace: ../.work
+  output: ../dist/frozenos-ros2.iso
+
+execution:
+  network: host
+
+steps:
+  - stage: rootfs
+    name: copy overlay
+    copy:
+      from: ./overlay
+      to: /
+
+  - stage: rootfs
+    name: apt update
+    run: apt update && apt install -y curl
