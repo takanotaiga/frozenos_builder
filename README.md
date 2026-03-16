@@ -1,6 +1,7 @@
 ## FrozenOS Builder
 
 **FrozenOS Builder** is a CLI tool for customizing Ubuntu installation ISOs.
+Japanese README: [`README.ja.md`](./README.ja.md)
 
 ## Requirements
 
@@ -28,5 +29,5 @@ dist/frozenos-minimal.iso
 ## Recipe
 
 See `examples/minimal.yml` for a minimal recipe example.
-
-Build runs always start from a clean workspace (`build.workspace` is deleted first) and remove the workspace again after a successful build.
+See `examples/ros2.yml` for a ROS 2 Jazzy customization example.
+`examples/overlay/autoinstall.yaml` is an Ubuntu Desktop autoinstall sample and is copied by recipe copy steps.

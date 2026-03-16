@@ -1389,6 +1389,7 @@ impl Drop for MountGuard {
 fn prepare_chroot_mounts(rootfs_dir: &Path) -> Result<MountGuard> {
     let mount_pairs = [
         ("/dev", "dev"),
+        ("/dev/pts", "dev/pts"),
         ("/proc", "proc"),
         ("/sys", "sys"),
         ("/run", "run"),

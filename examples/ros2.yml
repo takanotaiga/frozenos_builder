@@ -19,5 +19,19 @@ steps:
       to: /
 
   - stage: rootfs
-    name: apt update
-    run: apt update && apt install -y curl
+    name: ROS2 Jazzy Install
+    run: |
+      apt update
+      apt install -y curl
+      ROS_APT_SOURCE_VERSION="$(curl -fsSL https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | awk -F'"' '/"tag_name"/ {print $4; exit}')"
+      curl -fL -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
+      dpkg -i /tmp/ros2-apt-source.deb
+      apt update
+      apt install -y ros-dev-tools ros-jazzy-desktop
+
+  - stage: rootfs
+    name: Enable ROS2 environment for new users
+    run: |
+      if ! grep -qxF 'source /opt/ros/jazzy/setup.bash' /etc/skel/.bashrc; then
+        printf '\nsource /opt/ros/jazzy/setup.bash\n' >> /etc/skel/.bashrc
+      fi
