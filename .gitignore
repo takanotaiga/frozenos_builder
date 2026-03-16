@@ -1,0 +1,13 @@
+# Rust build artifacts
+/target/
+
+# Local build workspace/output
+/.work/
+/dist/
+
+# Local ISO files (base/test/output)
+*.iso
+
+# Editor/OS noise
+.DS_Store
+Thumbs.db
