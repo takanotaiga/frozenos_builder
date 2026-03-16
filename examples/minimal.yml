@@ -7,7 +7,6 @@ base:
 build:
   workspace: ../.work
   output: ../dist/frozenos-minimal.iso
-  keep_workdir: true
 
 execution:
   network: host

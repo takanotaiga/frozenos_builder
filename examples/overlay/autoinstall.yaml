@@ -1,0 +1,11 @@
+autoinstall:
+  version: 1
+  locale: en_US.UTF-8
+  keyboard:
+    layout: jp
+  identity:
+    hostname: frozenos
+    username: frozen
+    password: '$6$frozenos$7.zj1AzO6NHmq8RrF1./PEew6IkLDeGdKeRgBQ6czN/Fo.9nDLTxScEongi.VzrRNkM8ChG0tKlPIr75upEsZ1'
+  source:
+    id: ubuntu-desktop-minimal

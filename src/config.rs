@@ -30,8 +30,6 @@ pub struct BuildConfig {
     pub workspace: PathBuf,
     #[serde(default)]
     pub output: Option<PathBuf>,
-    #[serde(default)]
-    pub keep_workdir: bool,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -40,6 +38,8 @@ pub struct ExecutionConfig {
     pub sandbox: SandboxMode,
     #[serde(default)]
     pub network: NetworkMode,
+    #[serde(default = "default_layer_jobs")]
+    pub layer_jobs: usize,
 }
 
 impl Default for ExecutionConfig {
@@ -47,8 +47,13 @@ impl Default for ExecutionConfig {
         Self {
             sandbox: SandboxMode::Namespace,
             network: NetworkMode::Host,
+            layer_jobs: default_layer_jobs(),
         }
     }
+}
+
+fn default_layer_jobs() -> usize {
+    0
 }
 
 #[derive(Debug, Clone, Deserialize, Default)]
@@ -116,7 +121,6 @@ impl Recipe {
                 SUPPORTED_KIND
             );
         }
-
         let recipe_dir = recipe_path.parent().unwrap_or_else(|| Path::new("."));
         let base_iso = resolve_relative(recipe_dir, &self.base.iso);
         if !base_iso.is_file() {
@@ -217,7 +221,6 @@ mod tests {
             build: BuildConfig {
                 workspace: PathBuf::from(".work"),
                 output: Some(PathBuf::from("out.iso")),
-                keep_workdir: false,
             },
             execution: ExecutionConfig::default(),
             steps: vec![Step {
@@ -238,5 +241,41 @@ mod tests {
         assert!(err
             .to_string()
             .contains("must define exactly one action: run or copy"));
+    }
+
+    #[test]
+    fn validate_accepts_zero_layer_jobs_for_auto() {
+        let dir = tempdir().unwrap();
+        let iso = dir.path().join("base.iso");
+        let overlay = dir.path().join("overlay");
+        fs::write(iso, b"iso").unwrap();
+        fs::create_dir_all(overlay).unwrap();
+
+        let mut execution = ExecutionConfig::default();
+        execution.layer_jobs = 0;
+
+        let recipe = Recipe {
+            kind: SUPPORTED_KIND.to_string(),
+            name: None,
+            base: BaseConfig {
+                iso: PathBuf::from("base.iso"),
+            },
+            build: BuildConfig {
+                workspace: PathBuf::from(".work"),
+                output: Some(PathBuf::from("out.iso")),
+            },
+            execution,
+            steps: vec![Step {
+                stage: Stage::Rootfs,
+                name: None,
+                env: BTreeMap::new(),
+                workdir: None,
+                run: Some("echo hi".to_string()),
+                copy: None,
+            }],
+        };
+
+        let recipe_path = dir.path().join("recipe.yml");
+        recipe.validate(&recipe_path).unwrap();
     }
 }
